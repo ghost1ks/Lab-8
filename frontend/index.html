@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Інтернет-магазин</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Інтернет-магазин</h1>
+    <div id="userBox"></div>
+  </header>
+
+  <main>
+    
+    <section id="authBox" class="card">
+      <h2>Вхід / Реєстрація</h2>
+      <input id="name" placeholder="Ім'я (тільки для реєстрації)">
+      <input id="email" placeholder="Email" value="demo@shop.com">
+      <input id="password" type="password" placeholder="Пароль" value="demo1234">
+      <button onclick="login()">Увійти</button>
+      <button class="gray" onclick="register()">Зареєструватись</button>
+    </section>
+
+    
+    <section class="card">
+      <h2>Товари</h2>
+      <input id="search" placeholder="Пошук за назвою..." oninput="page = 1; loadProducts()">
+      <table>
+        <thead><tr><th>ID</th><th>Назва</th><th>Опис</th><th>Ціна, грн</th><th>На складі</th><th>Дії</th></tr></thead>
+        <tbody id="productsTable"></tbody>
+      </table>
+      <div class="pager">
+        <button class="gray" onclick="changePage(-1)">← Назад</button>
+        <span id="pageInfo"></span>
+        <button class="gray" onclick="changePage(1)">Далі →</button>
+      </div>
+    </section>
+
+    
+    <section class="card auth-only">
+      <h2 id="formTitle">Додати товар</h2>
+      <input id="pName" placeholder="Назва">
+      <input id="pDesc" placeholder="Опис">
+      <input id="pPrice" type="number" placeholder="Ціна">
+      <input id="pStock" type="number" placeholder="Кількість на складі">
+      <button onclick="saveProduct()">Зберегти</button>
+      <button class="gray" onclick="resetForm()">Очистити</button>
+    </section>
+
+    
+    <section class="card auth-only">
+      <h2>Мої замовлення</h2>
+      <select id="statusFilter" onchange="loadOrders()">
+        <option value="">Усі статуси</option>
+        <option value="new">new</option>
+        <option value="paid">paid</option>
+        <option value="shipped">shipped</option>
+        <option value="done">done</option>
+      </select>
+      <table>
+        <thead><tr><th>ID</th><th>Товар</th><th>К-сть</th><th>Сума</th><th>Статус</th><th>Дії</th></tr></thead>
+        <tbody id="ordersTable"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <div id="message"></div>
+  <script src="app.js"></script>
+</body>
+</html>

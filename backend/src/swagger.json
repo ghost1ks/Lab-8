@@ -1,0 +1,94 @@
+{
+  "openapi": "3.0.0",
+  "info": { "title": "Інтернет-магазин API", "version": "1.0.0", "description": "Лабораторна №8. Для захищених маршрутів натисни Authorize і встав токен з /api/login." },
+  "servers": [{ "url": "/" }],
+  "components": {
+    "securitySchemes": { "bearer": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" } }
+  },
+  "paths": {
+    "/api/register": {
+      "post": {
+        "tags": ["Auth"], "summary": "Реєстрація",
+        "requestBody": { "content": { "application/json": { "example": { "name": "Назар", "email": "nazar@test.com", "password": "1234" } } } },
+        "responses": { "201": { "description": "Створено, повертає user і token" }, "400": { "description": "Невірні дані" } }
+      }
+    },
+    "/api/login": {
+      "post": {
+        "tags": ["Auth"], "summary": "Логін (повертає JWT)",
+        "requestBody": { "content": { "application/json": { "example": { "email": "demo@shop.com", "password": "demo1234" } } } },
+        "responses": { "200": { "description": "OK, повертає token" }, "401": { "description": "Невірний email або пароль" } }
+      }
+    },
+    "/api/products": {
+      "get": {
+        "tags": ["Products"], "summary": "Список товарів (пошук + пагінація)",
+        "parameters": [
+          { "name": "search", "in": "query", "schema": { "type": "string" } },
+          { "name": "page", "in": "query", "schema": { "type": "integer" } },
+          { "name": "limit", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "{ items, total, page, limit }" } }
+      },
+      "post": {
+        "tags": ["Products"], "summary": "Створити товар", "security": [{ "bearer": [] }],
+        "requestBody": { "content": { "application/json": { "example": { "name": "Планшет", "description": "10 дюймів", "price": 6999, "stock": 5 } } } },
+        "responses": { "201": { "description": "Створено" }, "400": { "description": "Невірні дані" }, "401": { "description": "Немає токена" } }
+      }
+    },
+    "/api/products/{id}": {
+      "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+      "get": { "tags": ["Products"], "summary": "Один товар", "responses": { "200": { "description": "OK" }, "404": { "description": "Не знайдено" } } },
+      "put": {
+        "tags": ["Products"], "summary": "Змінити товар", "security": [{ "bearer": [] }],
+        "requestBody": { "content": { "application/json": { "example": { "name": "Планшет", "description": "11 дюймів", "price": 7499, "stock": 8 } } } },
+        "responses": { "200": { "description": "OK" }, "404": { "description": "Не знайдено" } }
+      },
+      "delete": { "tags": ["Products"], "summary": "Видалити товар", "security": [{ "bearer": [] }], "responses": { "204": { "description": "Видалено" }, "404": { "description": "Не знайдено" } } }
+    },
+    "/api/orders": {
+      "get": {
+        "tags": ["Orders"], "summary": "Мої замовлення (фільтр за status)", "security": [{ "bearer": [] }],
+        "parameters": [{ "name": "status", "in": "query", "schema": { "type": "string", "enum": ["new", "paid", "shipped", "done"] } }],
+        "responses": { "200": { "description": "Масив замовлень" } }
+      },
+      "post": {
+        "tags": ["Orders"], "summary": "Створити замовлення", "security": [{ "bearer": [] }],
+        "requestBody": { "content": { "application/json": { "example": { "product_id": 1, "quantity": 2 } } } },
+        "responses": { "201": { "description": "Створено" }, "400": { "description": "Мало товару / невірні дані" } }
+      }
+    },
+    "/api/orders/{id}": {
+      "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+      "get": { "tags": ["Orders"], "summary": "Одне замовлення", "security": [{ "bearer": [] }], "responses": { "200": { "description": "OK" }, "404": { "description": "Не знайдено" } } },
+      "put": {
+        "tags": ["Orders"], "summary": "Змінити статус", "security": [{ "bearer": [] }],
+        "requestBody": { "content": { "application/json": { "example": { "status": "shipped" } } } },
+        "responses": { "200": { "description": "OK" }, "400": { "description": "Невірний статус" } }
+      },
+      "delete": { "tags": ["Orders"], "summary": "Видалити замовлення", "security": [{ "bearer": [] }], "responses": { "204": { "description": "Видалено" } } }
+    },
+    "/api/payments": {
+      "get": { "tags": ["Payments"], "summary": "Мої платежі", "security": [{ "bearer": [] }], "responses": { "200": { "description": "Масив платежів" } } },
+      "post": {
+        "tags": ["Payments"], "summary": "Оплатити замовлення", "security": [{ "bearer": [] }],
+        "requestBody": { "content": { "application/json": { "example": { "order_id": 1, "method": "card" } } } },
+        "responses": { "201": { "description": "Оплачено" }, "400": { "description": "Вже оплачено / невірні дані" } }
+      }
+    },
+    "/api/payments/{id}": {
+      "parameters": [{ "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }],
+      "get": { "tags": ["Payments"], "summary": "Один платіж", "security": [{ "bearer": [] }], "responses": { "200": { "description": "OK" }, "404": { "description": "Не знайдено" } } },
+      "delete": { "tags": ["Payments"], "summary": "Скасувати платіж", "security": [{ "bearer": [] }], "responses": { "204": { "description": "Скасовано" } } }
+    },
+    "/api/users/me": {
+      "get": { "tags": ["Users"], "summary": "Мій профіль", "security": [{ "bearer": [] }], "responses": { "200": { "description": "OK" } } },
+      "put": {
+        "tags": ["Users"], "summary": "Змінити профіль", "security": [{ "bearer": [] }],
+        "requestBody": { "content": { "application/json": { "example": { "name": "Назар", "phone": "+380501234567", "address": "Ірпінь" } } } },
+        "responses": { "200": { "description": "OK" } }
+      },
+      "delete": { "tags": ["Users"], "summary": "Видалити акаунт", "security": [{ "bearer": [] }], "responses": { "204": { "description": "Видалено" } } }
+    }
+  }
+}

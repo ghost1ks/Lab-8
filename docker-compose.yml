@@ -1,0 +1,27 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: shop
+      POSTGRES_PASSWORD: shop
+      POSTGRES_DB: shop
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgres://shop:shop@db:5432/shop
+      JWT_SECRET: secret-for-lab
+      FRONTEND_DIR: /frontend
+    volumes:
+      - ./frontend:/frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+
+volumes:
+  dbdata:
